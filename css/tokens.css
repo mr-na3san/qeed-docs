@@ -1,0 +1,60 @@
+:root {
+  --col-bg:          #07070f;
+  --col-bg-2:        #0d0d1a;
+  --col-bg-3:        #12121f;
+  --col-surface:     #16162a;
+  --col-surface-2:   #1e1e38;
+  --col-border:      #2a2a4a;
+  --col-border-hi:   #3d3d6b;
+
+  --col-purple:      #8b5cf6;
+  --col-purple-lo:   #6d28d9;
+  --col-purple-hi:   #a78bfa;
+  --col-purple-glow: rgba(139,92,246,0.18);
+  --col-cyan:        #22d3ee;
+  --col-cyan-lo:     #0891b2;
+  --col-cyan-glow:   rgba(34,211,238,0.12);
+  --col-emerald:     #34d399;
+  --col-amber:       #fbbf24;
+  --col-rose:        #fb7185;
+
+  --col-text:        #e2e8f0;
+  --col-text-2:      #94a3b8;
+  --col-text-3:      #64748b;
+  --col-text-inv:    #07070f;
+
+  --font-display:    'Syne', 'Space Grotesk', sans-serif;
+  --font-body:       'DM Sans', 'Outfit', sans-serif;
+  --font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  16px;
+  --r-xl:  24px;
+
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.5);
+  --shadow-purple: 0 0 32px rgba(139,92,246,0.25), 0 0 8px rgba(139,92,246,0.15);
+  --shadow-cyan:   0 0 24px rgba(34,211,238,0.2);
+
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:    150ms;
+  --dur-med:     250ms;
+  --dur-slow:    400ms;
+
+  --sidebar-w:   280px;
+  --content-max: 800px;
+  --header-h:    60px;
+}

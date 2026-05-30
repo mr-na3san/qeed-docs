@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Transactions — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+</head>
+<body>
+
+  <div class="progress-bar"></div>
+  <header class="header">
+    <button class="header-menu-btn">☰</button>
+    <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+    <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+<div class="shell">
+  
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link active" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>Transactions</h1>
+    <p>Qeed wraps SQLite's native transaction system in a safe, ergonomic API. Every transaction uses <code>BEGIN IMMEDIATE</code>, commits on success, and rolls back on any thrown error.</p>
+
+    <h2 id="overview">Overview</h2>
+    <p><code>db.tx(fn)</code> runs your function inside a transaction. The function receives the same <code>db</code> instance. All reads and writes inside the function participate in the transaction.</p>
+
+    <h2 id="basic">Basic transaction</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.tx(scope => {
+  scope.set('account:alice', { balance: 950 });
+  scope.set('account:bob',   { balance: 150 });
+  scope.set('log:001', { type: 'transfer', amount: 50, ts: Date.now() });
+});
+// All three writes committed atomically</code></pre></div>
+
+    <h2 id="rollback">Automatic rollback</h2>
+    <p>Any error thrown inside <code>tx(fn)</code> — whether from Qeed validation or your own code — triggers an immediate rollback. The error is re-thrown to the caller.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const alice = db.get('account:alice').value;
+
+try {
+  db.tx(scope => {
+    if (alice.balance < 200) throw new Error('insufficient funds');
+    scope.set('account:alice', { balance: alice.balance - 200 });
+    scope.set('account:bob',   { balance: bob.balance   + 200 });
+  });
+} catch (err) {
+  console.log(err.message);  // 'insufficient funds'
+  // Both writes were rolled back — balances unchanged
+}</code></pre></div>
+
+    <h2 id="return">Return values</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const result = db.tx(scope => {
+  scope.set('counter', (scope.get('counter')?.value ?? 0) + 1);
+  return scope.get('counter').value;
+});
+
+console.log(result);  // the new counter value</code></pre></div>
+
+    <h2 id="batch">Batch vs tx</h2>
+    <p>Both <code>batch()</code> and <code>tx()</code> are atomic. Use each for different needs:</p>
+    <table>
+      <thead><tr><th></th><th><code>batch()</code></th><th><code>tx()</code></th></tr></thead>
+      <tbody>
+        <tr><td>Operation types</td><td>set and del only</td><td>Any db operation</td></tr>
+        <tr><td>Conditional logic</td><td>No</td><td>Yes — full JS</td></tr>
+        <tr><td>Read inside tx</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Performance</td><td>Slightly faster (no fn call)</td><td>Full flexibility</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="nested">Nested transactions</h2>
+    <p>Qeed does not support nested transactions. Calling <code>db.tx()</code> inside another <code>db.tx()</code> throws <code>TransactionError</code> immediately. This is intentional — SQLite savepoints exist but their partial-commit semantics create subtle bugs.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.tx(outer => {
+  outer.set('k1', 1);
+  db.tx(inner => { /* throws TransactionError */ });
+});</code></pre></div>
+    <p><strong>Design pattern</strong>: compose operations as functions that accept a <code>scope</code> parameter, then call them all within a single transaction:</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">function debitUser(scope, userId, amount) {
+  const rec = scope.get('account:' + userId);
+  if (!rec || rec.value.balance < amount) throw new Error('insufficient');
+  scope.set('account:' + userId, { ...rec.value, balance: rec.value.balance - amount });
+}
+
+function creditUser(scope, userId, amount) {
+  const rec = scope.get('account:' + userId);
+  const current = rec?.value?.balance ?? 0;
+  scope.set('account:' + userId, { balance: current + amount });
+}
+
+// Compose in a single tx — no nesting needed
+db.tx(scope => {
+  debitUser(scope, 'alice', 100);
+  creditUser(scope, 'bob',  100);
+});</code></pre></div>
+
+    <h2 id="internals">BEGIN IMMEDIATE internals</h2>
+    <p>Qeed uses <code>BEGIN IMMEDIATE</code> rather than the SQLite default <code>BEGIN DEFERRED</code>. This eliminates the deferred-to-exclusive upgrade race that can occur in WAL mode when a transaction starts as a read but later attempts a write. <code>IMMEDIATE</code> acquires the write lock upfront, preventing <code>SQLITE_BUSY</code> mid-transaction.</p>
+
+    <h2 id="patterns">Real-world patterns</h2>
+    <h4>Counter with uniqueness guarantee</h4>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">function nextId(scope, key) {
+  const current = scope.get(key)?.value ?? 0;
+  const next = current + 1;
+  scope.set(key, next);
+  return next;
+}
+
+const orderId = db.tx(scope => {
+  const id = nextId(scope, 'seq:orders');
+  scope.set('order:' + id, { items: [...], total: 149.00 });
+  return id;
+});</code></pre></div>
+
+    <h4>Optimistic update with validation</h4>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.tx(scope => {
+  const rec = scope.get('config:limits');
+  if (!rec) throw new Error('config not found');
+  if (rec.value.version !== expectedVersion) throw new Error('stale read');
+  scope.set('config:limits', {
+    ...rec.value,
+    rateLimit: 500,
+    version: rec.value.version + 1,
+  });
+});</code></pre></div>
+
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="query.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">Query Builder</span></a>
+      <a class="page-nav-item next" href="cache.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">Cache System</span></a>
+    </nav>
+  </div></main>
+  
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#overview">Overview</a>
+    <a class="toc-float-link" href="#basic">Basic transaction</a>
+    <a class="toc-float-link" href="#rollback">Automatic rollback</a>
+    <a class="toc-float-link" href="#return">Return values</a>
+    <a class="toc-float-link" href="#batch">Batch vs tx</a>
+    <a class="toc-float-link" href="#nested">Nested transactions</a>
+    <a class="toc-float-link" href="#internals">BEGIN IMMEDIATE</a>
+    <a class="toc-float-link" href="#patterns">Real-world patterns</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

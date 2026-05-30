@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Quick Start — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="stylesheet" href="../css/tokens.css" /><link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" /><link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+<div class="progress-bar"></div>
+<header class="header">
+  <button class="header-menu-btn">☰</button>
+  <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+  <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+  <nav class="header-actions">
+    <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+  </nav>
+</header>
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link active" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>Quick Start</h1>
+    <p>You'll have a persistent, queryable key-value store running in under two minutes.</p>
+
+    <h2 id="open">Open a database</h2>
+    <p>The <code>qeed()</code> factory opens (or creates) a SQLite file, applies WAL mode, initialises the schema, and returns a ready-to-use database instance.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">import { qeed } from 'qeed';
+
+// File database — persists across restarts
+const db = qeed({ path: './myapp.db' });
+
+// In-memory — ideal for tests, discarded on close
+const mem = qeed({ path: ':memory:' });</code></pre></div>
+
+    <div class="notice tip"><span class="notice-icon">💡</span><div class="notice-body"><strong>Always call <code>db.close()</code></strong> when your process exits to flush the WAL and release the file lock. Use <code>process.on('exit', () => db.close())</code> as a safety net.</div></div>
+
+    <h2 id="crud">Basic CRUD</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Store any JSON-serializable value
+db.set('user:1', { name: 'Alice', role: 'admin', score: 95 });
+db.set('config', { theme: 'dark', lang: 'en' });
+db.set('count', 42);
+db.set('flag', true);
+db.set('empty', null);
+
+// Read a record — returns null if missing or expired
+const rec = db.get('user:1');
+rec.value;      // { name: 'Alice', role: 'admin', score: 95 }
+rec.key;        // 'user:1'
+rec.namespace;  // 'default'
+rec.collection; // 'default'
+rec.createdAt;  // Unix ms
+rec.updatedAt;  // Unix ms
+rec.expiresAt;  // null (no TTL set)
+rec.meta;       // null
+
+// Check existence
+db.has('user:1');        // true
+db.has('nonexistent');   // false
+
+// Update — set() is always an upsert
+db.set('user:1', { name: 'Alice', role: 'superadmin', score: 99 });
+
+// Delete — returns true if the record existed
+db.delete('config');     // true
+db.delete('config');     // false (already gone)</code></pre></div>
+
+    <h2 id="records">The record object</h2>
+    <p>Every <code>get()</code> returns a <strong>frozen</strong> record object. Attempting to mutate it throws in strict mode.</p>
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>key</code></td><td>string</td><td>The stored key</td></tr>
+        <tr><td><code>value</code></td><td>any</td><td>Deserialized JSON value</td></tr>
+        <tr><td><code>namespace</code></td><td>string</td><td>Namespace the record lives in</td></tr>
+        <tr><td><code>collection</code></td><td>string</td><td>Collection within the namespace</td></tr>
+        <tr><td><code>createdAt</code></td><td>number</td><td>Unix ms — set on first write, never updated</td></tr>
+        <tr><td><code>updatedAt</code></td><td>number</td><td>Unix ms — updated on every write</td></tr>
+        <tr><td><code>expiresAt</code></td><td>number | null</td><td>Unix ms expiry, or null for no TTL</td></tr>
+        <tr><td><code>meta</code></td><td>object | null</td><td>Optional metadata blob</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="ttl">TTL and expiration</h2>
+    <p>TTL is specified in milliseconds. Expired keys return <code>null</code> from <code>get()</code>, <code>false</code> from <code>has()</code>, and are excluded from all queries — without any per-key timer overhead.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Expires in 30 seconds
+db.set('session:abc', { userId: 1 }, { ttl: 30_000 });
+
+// Extend TTL on an existing key
+db.ttl('session:abc', 60_000);    // now expires in 60s from now
+
+// Remove TTL — key lives forever
+db.persist('session:abc');
+
+// Expired keys vanish automatically
+await new Promise(r => setTimeout(r, 31_000));
+db.get('session:abc');  // null — expired</code></pre></div>
+
+    <div class="notice warn"><span class="notice-icon">⚠️</span><div class="notice-body"><strong>TTL precision.</strong> Expiry is checked at read time. Expired records are physically deleted by a background sweep (default every 60 seconds). They are never returned, but they do occupy disk space until swept.</div></div>
+
+    <h2 id="metadata">Metadata</h2>
+    <p>Store arbitrary metadata alongside a value — useful for audit trails, versioning, or source tracking without polluting the value itself.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.set('invoice:7', { total: 249.00, currency: 'USD' }, {
+  meta: { source: 'stripe', version: 3, createdBy: 'api' }
+});
+
+const rec = db.get('invoice:7');
+rec.value;  // { total: 249.00, currency: 'USD' }
+rec.meta;   // { source: 'stripe', version: 3, createdBy: 'api' }</code></pre></div>
+
+    <h2 id="namespaces">Namespaces and collections</h2>
+    <p>Namespaces and collections provide isolation at the storage level — the same key can exist independently in each. Scoped instances share the database connection, cache, events, and metrics.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const db = qeed({ path: './app.db', namespace: 'myapp' });
+
+// Scoped to myapp/users
+const users = db.collection('users');
+users.set('u:1', { name: 'Alice' });
+
+// Scoped to myapp/posts
+const posts = db.collection('posts');
+posts.set('u:1', { title: 'Hello' });   // same key, different collection
+
+users.get('u:1').value;  // { name: 'Alice' }
+posts.get('u:1').value;  // { title: 'Hello' }
+
+// Cross-namespace isolation
+const tenantA = db.namespace('tenant_a').collection('users');
+const tenantB = db.namespace('tenant_b').collection('users');
+tenantA.set('u:1', { plan: 'pro' });
+tenantB.set('u:1', { plan: 'free' });
+tenantA.get('u:1').value;   // { plan: 'pro' }
+tenantB.get('u:1').value;   // { plan: 'free' }
+
+// Bulk operations
+users.flushCollection();             // delete all users records
+db.namespace('tenant_a').flushNamespace();  // delete all of tenant_a
+users.deletePrefix('u:');            // delete keys starting with 'u:'</code></pre></div>
+
+    <h2 id="field-access">Dot-notation field access</h2>
+    <p>Read a single nested field without deserializing the whole value:</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.set('profile:1', {
+  user: { name: 'Bob', address: { city: 'NYC', zip: '10001' } }
+});
+
+const rec = db.get('profile:1', { field: 'user.address.city' });
+rec.value;  // 'NYC'</code></pre></div>
+
+    <h2 id="batch">Batch operations</h2>
+    <p>Run multiple operations in a single atomic transaction — either all succeed or all roll back.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.batch([
+  { type: 'set', key: 'product:1', value: { name: 'Widget', stock: 100 } },
+  { type: 'set', key: 'product:2', value: { name: 'Gadget', stock: 50 }, options: { ttl: 86_400_000 } },
+  { type: 'del', key: 'product:discontinued' },
+]);
+// All three operations applied, or none.</code></pre></div>
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="installation.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">Installation</span></a>
+      <a class="page-nav-item next" href="configuration.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">Configuration</span></a>
+    </nav>
+  </div></main>
+
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#open">Open a database</a>
+    <a class="toc-float-link" href="#crud">Basic CRUD</a>
+    <a class="toc-float-link" href="#records">The record object</a>
+    <a class="toc-float-link" href="#ttl">TTL and expiration</a>
+    <a class="toc-float-link" href="#metadata">Metadata</a>
+    <a class="toc-float-link" href="#namespaces">Namespaces</a>
+    <a class="toc-float-link" href="#field-access">Field access</a>
+    <a class="toc-float-link" href="#batch">Batch operations</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Installation — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="stylesheet" href="../css/tokens.css" /><link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" /><link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+<div class="progress-bar"></div>
+<header class="header">
+  <button class="header-menu-btn">☰</button>
+  <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+  <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+  <nav class="header-actions">
+    <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+  </nav>
+</header>
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link active" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>Installation</h1>
+    <p>Qeed requires <strong>Node.js 18 or later</strong> and compiles one native addon (<code>better-sqlite3</code>) on first install. No other runtime dependencies exist.</p>
+
+    <h2 id="npm">npm</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">npm install qeed</code></pre></div>
+
+    <h2 id="other-managers">yarn / pnpm / bun</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">yarn add qeed
+pnpm add qeed
+bun add qeed</code></pre></div>
+
+    <h2 id="requirements">Build requirements</h2>
+    <p><code>better-sqlite3</code> is a native C++ addon. The build toolchain must be present:</p>
+    <table>
+      <thead><tr><th>Platform</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td>Linux / WSL</td><td><code>build-essential</code>, <code>python3</code></td></tr>
+        <tr><td>macOS</td><td>Xcode Command Line Tools: <code>xcode-select --install</code></td></tr>
+        <tr><td>Windows</td><td>Visual Studio Build Tools with "Desktop development with C++"</td></tr>
+      </tbody>
+    </table>
+    <div class="notice info"><span class="notice-icon">💡</span><div class="notice-body"><strong>Prebuilds available.</strong> <code>better-sqlite3</code> ships precompiled binaries for common Node.js LTS versions on Linux, macOS, and Windows. If a prebuild matches your platform, no compiler is needed.</div></div>
+
+    <h2 id="esm">ESM import</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">import { qeed, Qeed } from 'qeed';
+import { ValidationError, IOError } from 'qeed';</code></pre></div>
+
+    <h2 id="cjs">CommonJS require</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const { qeed, Qeed } = require('qeed');
+const { ValidationError, IOError } = require('qeed');</code></pre></div>
+
+    <div class="notice tip"><span class="notice-icon">✅</span><div class="notice-body"><strong>No dual-package hazard.</strong> Qeed ships a single CommonJS source with an ESM shim via <code>createRequire</code>. Both import styles load the same code — one module instance regardless of how it is imported.</div></div>
+
+    <h2 id="typescript">TypeScript</h2>
+    <p>Qeed ships JSDoc typings. TypeScript users get full IntelliSense without a separate <code>@types</code> package. Add <code>"checkJs": true</code> to your <code>tsconfig.json</code> to enable type checking of JavaScript that imports Qeed.</p>
+
+    <h2 id="verify">Verify your install</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">import { qeed } from 'qeed';
+
+const db = qeed({ path: ':memory:' });
+db.set('hello', 'world');
+console.log(db.get('hello').value); // 'world'
+db.close();</code></pre></div>
+
+    <nav class="page-nav">
+      <div></div>
+      <a class="page-nav-item next" href="quickstart.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">Quick Start</span></a>
+    </nav>
+  </div></main>
+
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#npm">npm</a>
+    <a class="toc-float-link" href="#other-managers">Other managers</a>
+    <a class="toc-float-link" href="#requirements">Build requirements</a>
+    <a class="toc-float-link" href="#esm">ESM import</a>
+    <a class="toc-float-link" href="#cjs">CommonJS require</a>
+    <a class="toc-float-link" href="#typescript">TypeScript</a>
+    <a class="toc-float-link" href="#verify">Verify install</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

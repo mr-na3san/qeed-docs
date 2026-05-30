@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>API Reference — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+</head>
+<body>
+
+  <div class="progress-bar"></div>
+  <header class="header">
+    <button class="header-menu-btn">☰</button>
+    <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+    <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+<div class="shell">
+  
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link active" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>API Reference</h1>
+    <p>Complete method signatures for the <code>Qeed</code> class. All methods are synchronous except <code>backup()</code>, <code>verifyBackup()</code>, <code>restore()</code>, and <code>export()</code>.</p>
+
+    <h2 id="factory">Factory and constructor</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">qeed(config)</span><span class="method-ret">→ Qeed</span></div>
+      <div class="method-body"><p class="method-desc">Open a database and return a ready-to-use instance. Equivalent to <code>new Qeed(config).open()</code>.</p></div>
+    </div>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">new Qeed(config)</span><span class="method-ret">→ Qeed</span></div>
+      <div class="method-body"><p class="method-desc">Create an instance without opening. Call <code>db.open()</code> explicitly.</p></div>
+    </div>
+
+    <h2 id="set">set()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.set</span><span class="method-sig">(key, value, opts?)</span><span class="method-ret">→ void</span></div>
+      <div class="method-body">
+        <p class="method-desc">Write a key-value pair. Always an upsert — if the key exists it is overwritten.</p>
+        <div class="method-params">
+          <div class="method-param"><span class="param-name">key</span><span class="param-type">string</span><span class="param-desc">Printable string, max 512 bytes, no null bytes</span></div>
+          <div class="method-param"><span class="param-name">value</span><span class="param-type">any</span><span class="param-desc">Any JSON-serializable value. <code>undefined</code> throws. Max 1MB serialized, max 10 nesting levels.</span></div>
+          <div class="method-param"><span class="param-name">opts.ttl</span><span class="param-type">number?</span><span class="param-opt">optional</span><span class="param-desc">Expiry in milliseconds from now. Must be a positive finite number.</span></div>
+          <div class="method-param"><span class="param-name">opts.collection</span><span class="param-type">string?</span><span class="param-opt">optional</span><span class="param-desc">Override the default collection for this call.</span></div>
+          <div class="method-param"><span class="param-name">opts.meta</span><span class="param-type">object?</span><span class="param-opt">optional</span><span class="param-desc">Arbitrary metadata blob. Must be a plain object.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="get">get()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.get</span><span class="method-sig">(key, opts?)</span><span class="method-ret">→ QeedRecord | null</span></div>
+      <div class="method-body">
+        <p class="method-desc">Read a record. Returns <code>null</code> if the key does not exist or has expired. The returned record is frozen.</p>
+        <div class="method-params">
+          <div class="method-param"><span class="param-name">key</span><span class="param-type">string</span><span class="param-desc">Key to read</span></div>
+          <div class="method-param"><span class="param-name">opts.field</span><span class="param-type">string?</span><span class="param-opt">optional</span><span class="param-desc">Dot-notation field to pluck from value. Result is in <code>rec.value</code>. Bypasses cache.</span></div>
+          <div class="method-param"><span class="param-name">opts.collection</span><span class="param-type">string?</span><span class="param-opt">optional</span><span class="param-desc">Override the default collection for this call.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="delete">delete()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.delete</span><span class="method-sig">(key, opts?)</span><span class="method-ret">→ boolean</span></div>
+      <div class="method-body"><p class="method-desc">Delete a key. Returns <code>true</code> if the key existed, <code>false</code> otherwise.</p></div>
+    </div>
+
+    <h2 id="has">has()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.has</span><span class="method-sig">(key, opts?)</span><span class="method-ret">→ boolean</span></div>
+      <div class="method-body"><p class="method-desc">Check if a key exists and has not expired. Returns <code>false</code> for missing or expired keys.</p></div>
+    </div>
+
+    <h2 id="ttl">ttl() and persist()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.ttl</span><span class="method-sig">(key, ms, opts?)</span><span class="method-ret">→ boolean</span></div>
+      <div class="method-body"><p class="method-desc">Set or update the TTL of an existing, non-expired key. Returns <code>true</code> if the key was found and updated.</p></div>
+    </div>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.persist</span><span class="method-sig">(key, opts?)</span><span class="method-ret">→ boolean</span></div>
+      <div class="method-body"><p class="method-desc">Remove the TTL from an existing key, making it permanent. Returns <code>true</code> if the key existed.</p></div>
+    </div>
+
+    <h2 id="batch">batch()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.batch</span><span class="method-sig">(ops[], opts?)</span><span class="method-ret">→ number</span></div>
+      <div class="method-body">
+        <p class="method-desc">Execute multiple set/del operations in a single atomic transaction. Returns the number of operations applied.</p>
+        <div class="method-params">
+          <div class="method-param"><span class="param-name">ops</span><span class="param-type">BatchOp[]</span><span class="param-desc">Array of <code>{ type: 'set'|'del', key, value?, options? }</code> objects. All are validated before any DB write begins.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="tx">tx()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.tx</span><span class="method-sig">(fn)</span><span class="method-ret">→ any</span></div>
+      <div class="method-body"><p class="method-desc">Run <code>fn</code> inside a <code>BEGIN IMMEDIATE</code> transaction. <code>fn</code> receives the <code>db</code> instance. Commits on success, rolls back and re-throws on any error. The return value of <code>fn</code> is returned. Nested calls throw <code>TransactionError</code>.</p></div>
+    </div>
+
+    <h2 id="query">query()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.query</span><span class="method-sig">(opts?)</span><span class="method-ret">→ QueryBuilder</span></div>
+      <div class="method-body"><p class="method-desc">Return a fluent <code>QueryBuilder</code> scoped to the current namespace and collection. See <a href="query.html">Query Builder</a> for the full API.</p></div>
+    </div>
+
+    <h2 id="ns-col">namespace() and collection()</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.namespace</span><span class="method-sig">(name)</span><span class="method-ret">→ Qeed</span></div>
+      <div class="method-body"><p class="method-desc">Return a new <code>Qeed</code> instance scoped to <code>name</code>. Shares the connection, cache, events, and metrics with the parent.</p></div>
+    </div>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.collection</span><span class="method-sig">(name)</span><span class="method-ret">→ Qeed</span></div>
+      <div class="method-body"><p class="method-desc">Return a new <code>Qeed</code> instance scoped to <code>name</code> within the current namespace.</p></div>
+    </div>
+
+    <h2 id="flush">Flush methods</h2>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.flushNamespace</span><span class="method-sig">()</span><span class="method-ret">→ number</span></div>
+      <div class="method-body"><p class="method-desc">Delete all records in the current namespace. Returns count deleted. Also flushes the cache for the namespace.</p></div>
+    </div>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.flushCollection</span><span class="method-sig">(col?)</span><span class="method-ret">→ number</span></div>
+      <div class="method-body"><p class="method-desc">Delete all records in the current (or specified) collection. Also invalidates the collection's cache bucket.</p></div>
+    </div>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.deletePrefix</span><span class="method-sig">(prefix, opts?)</span><span class="method-ret">→ number</span></div>
+      <div class="method-body"><p class="method-desc">Delete all keys starting with <code>prefix</code> in the current collection. Uses index-friendly BETWEEN rewrite.</p></div>
+    </div>
+    <div class="method-block">
+      <div class="method-header"><span class="method-name">db.sweep</span><span class="method-sig">()</span><span class="method-ret">→ number</span></div>
+      <div class="method-body"><p class="method-desc">Manually run the TTL sweep. Returns the number of expired records deleted. The automatic sweep runs every <code>sweepInterval</code> ms.</p></div>
+    </div>
+
+    <h2 id="events">Events API</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const unsub = db.on(event, fn);   // subscribe → returns unsubscribe fn
+db.once(event, fn);               // subscribe for one emission
+db.off(event, fn);                // unsubscribe by reference
+
+// Valid events: 'set' | 'update' | 'delete' | 'clear' | 'expire' | 'error'</code></pre></div>
+
+    <h2 id="observe">Observability</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.metrics();          // → full metrics snapshot (ops, cache, latency, slow queries)
+db.diagnostics();      // → full diagnostics snapshot (metrics + db PRAGMA stats + health)
+db.health();           // → { status, warnings, errors }
+db.integrityCheck();   // → 'ok' | string[]  (runs PRAGMA integrity_check)
+db.slowQueryLog();     // → array of { op, ms, at, meta }</code></pre></div>
+
+    <h2 id="io">Backup and IO</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">await db.backup(destDir, { compress: false, onProgress: fn }); // → BackupResult
+await db.verifyBackup(backupDir);   // → { valid, recordCount, warnings }
+await db.restore(backupDir, { verifyChecksum: true });  // → { recordCount, durationMs }
+db.listBackups(backupDir);          // → manifest[]
+
+await db.export(destPath, { format: 'json', compress: false, namespace, collection });
+db.import(srcPath, { verifyChecksum: true, skipInvalid: false, namespace, collection });</code></pre></div>
+
+    <h2 id="errors">Error types</h2>
+    <table>
+      <thead><tr><th>Class</th><th>Code</th><th>When thrown</th></tr></thead>
+      <tbody>
+        <tr><td><code>QeedError</code></td><td>base</td><td>Base class for all Qeed errors</td></tr>
+        <tr><td><code>InvalidKeyError</code></td><td><code>INVALID_KEY</code></td><td>Key fails validation (empty, null byte, too long)</td></tr>
+        <tr><td><code>InvalidValueError</code></td><td><code>INVALID_VALUE</code></td><td><code>undefined</code>, function, circular ref, too large</td></tr>
+        <tr><td><code>ValidationError</code></td><td><code>VALIDATION_ERROR</code></td><td>Namespace, collection, field, operator, TTL fails</td></tr>
+        <tr><td><code>TransactionError</code></td><td><code>TRANSACTION_ERROR</code></td><td>Nested transaction, <code>tx()</code> without function arg</td></tr>
+        <tr><td><code>LifecycleError</code></td><td><code>LIFECYCLE_ERROR</code></td><td>Double open, use after close, bad config</td></tr>
+        <tr><td><code>IOError</code></td><td><code>IO_ERROR</code></td><td>Backup, restore, export, import failures</td></tr>
+      </tbody>
+    </table>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">import { ValidationError } from 'qeed';
+try {
+  db.set('', 'value');
+} catch (err) {
+  err instanceof ValidationError;  // true
+  err.code;                        // 'INVALID_KEY'
+  err.context;                     // { key: '' }
+  err.message;                     // human-readable
+}</code></pre></div>
+
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="cache.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">Cache System</span></a>
+      <a class="page-nav-item next" href="advanced.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">Advanced Guide</span></a>
+    </nav>
+  </div></main>
+  
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#factory">qeed() / new Qeed()</a>
+    <a class="toc-float-link" href="#set">set()</a>
+    <a class="toc-float-link" href="#get">get()</a>
+    <a class="toc-float-link" href="#delete">delete()</a>
+    <a class="toc-float-link" href="#has">has()</a>
+    <a class="toc-float-link" href="#ttl">ttl() / persist()</a>
+    <a class="toc-float-link" href="#batch">batch()</a>
+    <a class="toc-float-link" href="#tx">tx()</a>
+    <a class="toc-float-link" href="#query">query()</a>
+    <a class="toc-float-link" href="#ns-col">namespace() / collection()</a>
+    <a class="toc-float-link" href="#flush">flush methods</a>
+    <a class="toc-float-link" href="#events">Events API</a>
+    <a class="toc-float-link" href="#observe">Observability</a>
+    <a class="toc-float-link" href="#io">Backup & IO</a>
+    <a class="toc-float-link" href="#errors">Error types</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

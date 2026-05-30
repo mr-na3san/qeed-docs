@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Cache System — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+</head>
+<body>
+
+  <div class="progress-bar"></div>
+  <header class="header">
+    <button class="header-menu-btn">☰</button>
+    <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+    <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+<div class="shell">
+  
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link active" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>Cache System</h1>
+    <p>Qeed's optional in-process cache sits in front of every <code>get()</code> call. A cache hit returns a frozen record reference with zero SQLite I/O — reaching 1.8M+ reads per second on a warm cache.</p>
+
+    <h2 id="overview">How it works</h2>
+    <p>The cache is organised into <em>buckets</em> — one Map (or LRU) per <code>namespace+collection</code> pair. Reads populate the cache. Writes, deletes, TTL changes, and imports all synchronously invalidate the relevant entry or bucket before returning.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Read path:
+// 1. cache.get(ns, col, key)
+//    → HIT  → return frozen record (zero DB I/O)
+//    → MISS → store.get() → cache.set() → return record
+
+// Write path:
+// store.set() → cache.invalidate(ns, col, key) → return</code></pre></div>
+
+    <h2 id="enable">Enabling the cache</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const db = qeed({
+  path: './data.db',
+  cache: {
+    enabled: true,
+    mode: 'lru',      // recommended for most workloads
+    maxSize: 1000,    // max entries per namespace+collection bucket
+  },
+});</code></pre></div>
+
+    <h2 id="lru">LRU mode</h2>
+    <p>In LRU mode, each bucket is backed by a doubly-linked list + Map providing O(1) get, set, and evict. When the bucket reaches <code>maxSize</code>, the least-recently-used entry is evicted.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const db = qeed({ path: './app.db', cache: { enabled: true, mode: 'lru', maxSize: 500 } });
+
+// Warm the cache
+for (let i = 0; i < 500; i++) {
+  db.set('cfg:' + i, { value: i });
+  db.get('cfg:' + i);
+}
+
+// Access cfg:0 to promote it to MRU position
+db.get('cfg:0');
+
+// Adding cfg:500 evicts cfg:1 (LRU), not cfg:0
+db.set('cfg:500', { value: 500 });
+db.get('cfg:500');</code></pre></div>
+
+    <h2 id="simple">Simple mode</h2>
+    <p>Simple mode uses a plain Map with FIFO eviction — the oldest-inserted entry is removed when the bucket is full. Lower overhead than LRU, but less optimal for workloads with a hot subset of keys.</p>
+
+    <h2 id="isolation">Namespace isolation</h2>
+    <p>Each namespace+collection pair has an independent bucket. Flushing namespace A never touches namespace B's cache entries.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const ns1 = db.namespace('tenant_a');
+const ns2 = db.namespace('tenant_b');
+
+ns1.set('k', 'val-a'); ns1.get('k'); // ns1 cache populated
+ns2.set('k', 'val-b'); ns2.get('k'); // ns2 cache populated
+
+ns1.set('k', 'updated-a');  // invalidates ns1 bucket only
+ns2.get('k').value;          // 'val-b' — ns2 cache unaffected</code></pre></div>
+
+    <h2 id="invalidation">Invalidation guarantees</h2>
+    <p>The cache is <em>never stale</em> after any Qeed API call. Invalidation is synchronous and happens before the operation returns.</p>
+    <table>
+      <thead><tr><th>Operation</th><th>Cache effect</th></tr></thead>
+      <tbody>
+        <tr><td><code>set()</code></td><td>Invalidate <code>(ns, col, key)</code></td></tr>
+        <tr><td><code>delete()</code></td><td>Invalidate <code>(ns, col, key)</code></td></tr>
+        <tr><td><code>ttl()</code></td><td>Invalidate <code>(ns, col, key)</code></td></tr>
+        <tr><td><code>persist()</code></td><td>Invalidate <code>(ns, col, key)</code></td></tr>
+        <tr><td><code>batch()</code></td><td>Invalidate each key in the batch</td></tr>
+        <tr><td><code>flushCollection()</code></td><td>Clear the entire collection bucket</td></tr>
+        <tr><td><code>flushNamespace()</code></td><td>Clear all buckets for the namespace</td></tr>
+        <tr><td><code>deletePrefix()</code></td><td>Invalidate all matching cache keys</td></tr>
+        <tr><td><code>import()</code></td><td>Flush entire cache</td></tr>
+      </tbody>
+    </table>
+    <div class="notice info"><span class="notice-icon">🔒</span><div class="notice-body"><strong>Field-pluck reads bypass the cache.</strong> A <code>get(key, { field: 'user.name' })</code> call always hits the database. This prevents a full-record cache entry from being shadowed by a partial read that could go stale.</div></div>
+
+    <h2 id="stats">Cache statistics</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const m = db.metrics();
+m.cache.hits;         // number of cache hits
+m.cache.misses;       // number of cache misses
+m.cache.evictions;    // entries evicted due to maxSize
+m.cache.invalidations;// entries removed by write/delete/flush
+m.cache.hitRate;      // percentage: hits / (hits + misses) * 100
+m.cache.size;         // current total entries across all buckets
+m.cache.buckets;      // number of active namespace+collection buckets</code></pre></div>
+
+    <h2 id="patterns">Patterns</h2>
+    <h4>Hot-key workload (LRU ideal)</h4>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Config and feature flags — read millions of times, updated rarely
+const db = qeed({
+  path: './app.db',
+  cache: { enabled: true, mode: 'lru', maxSize: 200 }
+});
+
+db.set('config:rateLimit', { requests: 1000, window: 60_000 });
+// First access hits DB; subsequent reads are pure in-memory
+for (let i = 0; i < 1_000_000; i++) {
+  const cfg = db.get('config:rateLimit');
+  // ...
+}</code></pre></div>
+
+    <h2 id="limits">Limits and tradeoffs</h2>
+    <ul>
+      <li><strong>Memory:</strong> <code>maxSize</code> is counted in entries, not bytes. A bucket of 1000 entries with 1KB values uses ~1MB. Size your cache against available process memory.</li>
+      <li><strong>Single-process only:</strong> The cache is in-process. A second Node.js process opening the same SQLite file will not see the first process's cache entries — or its invalidations. Do not use the cache in multi-process deployments unless you accept eventual consistency.</li>
+      <li><strong>No TTL in cache:</strong> Cache entries do not have their own expiry. Expired records are filtered at the DB read layer — if a cached record's <code>expiresAt</code> passes, the cache entry will return a frozen record that Qeed's DB layer would have filtered. Use <code>sweepInterval</code> to keep expired records out of the DB and therefore out of the cache population.</li>
+    </ul>
+
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="transactions.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">Transactions</span></a>
+      <a class="page-nav-item next" href="api.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">API Reference</span></a>
+    </nav>
+  </div></main>
+  
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#overview">Overview</a>
+    <a class="toc-float-link" href="#enable">Enabling the cache</a>
+    <a class="toc-float-link" href="#lru">LRU mode</a>
+    <a class="toc-float-link" href="#simple">Simple mode</a>
+    <a class="toc-float-link" href="#isolation">Namespace isolation</a>
+    <a class="toc-float-link" href="#invalidation">Invalidation guarantees</a>
+    <a class="toc-float-link" href="#stats">Cache statistics</a>
+    <a class="toc-float-link" href="#patterns">Patterns</a>
+    <a class="toc-float-link" href="#limits">Limits and tradeoffs</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

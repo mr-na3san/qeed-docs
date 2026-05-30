@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>FAQ — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+</head>
+<body>
+
+  <div class="progress-bar"></div>
+  <header class="header">
+    <button class="header-menu-btn">☰</button>
+    <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+    <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+<div class="shell">
+  
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link active" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>FAQ</h1>
+
+    <h2 id="multi-process">Can I use Qeed across multiple processes?</h2>
+    <p><strong>For reads: yes.</strong> SQLite WAL mode allows multiple readers on the same file from different processes. For writes, only one writer can hold the lock at a time — SQLite serializes concurrent writers via <code>busy_timeout</code>.</p>
+    <p><strong>The in-process cache is not shared across processes.</strong> If process A writes a value and process B has it cached, B's cache will be stale until the next cache miss (which triggers a DB read). For multi-process write-heavy workloads, either disable the cache or implement an out-of-band cache invalidation channel.</p>
+
+    <h2 id="encryption">Does Qeed encrypt data at rest?</h2>
+    <p>No. Qeed stores data in a standard SQLite file. For encryption at rest, use <strong>SQLCipher</strong> (an encrypted SQLite variant) or encrypt the storage volume at the OS level (LUKS, FileVault, BitLocker). Do not store passwords, private keys, or other secrets in Qeed without separate encryption.</p>
+
+    <h2 id="typescript">TypeScript support?</h2>
+    <p>Qeed ships JSDoc typings throughout. TypeScript users get full IntelliSense — parameter types, return types, and option autocomplete — without a separate <code>@types</code> package and without a build step. Add <code>"checkJs": true</code> to your <code>tsconfig.json</code> to enable type checking across JavaScript files that import Qeed.</p>
+    <p>A separate <code>.d.ts</code> file is planned for a future release.</p>
+
+    <h2 id="memory">How much memory does Qeed use?</h2>
+    <p>Memory consumption has three components:</p>
+    <ul>
+      <li><strong>SQLite page cache:</strong> Controlled by <code>PRAGMA cache_size</code>. Default is -8000 (8MB). Increase for read-heavy workloads, decrease for constrained environments.</li>
+      <li><strong>In-process cache:</strong> Disabled by default. When enabled, <code>maxSize</code> entries × average record size. A bucket of 1000 entries at ~1KB each ≈ 1MB.</li>
+      <li><strong>Prepared statement cache:</strong> One compiled SQLite statement per distinct SQL string. Fixed at ~10–15 statements for typical usage. Negligible.</li>
+    </ul>
+
+    <h2 id="corruption">Can the database get corrupted?</h2>
+    <p>SQLite with WAL mode and <code>PRAGMA synchronous=NORMAL</code> is extremely durable. The combination protects against process crashes. A power failure mid-write is the main remaining risk — use <code>PRAGMA synchronous=FULL</code> to eliminate it at a performance cost.</p>
+    <p>Run <code>db.integrityCheck()</code> periodically to detect corruption early. Backup files include a SHA-256 checksum and SQLite integrity check before restore commits.</p>
+
+    <h2 id="wal-size">The -wal file is growing. Why?</h2>
+    <p>SQLite checkpoints the WAL file into the main database file automatically. If the WAL keeps growing, a long-running read transaction is holding an old snapshot and preventing the checkpoint. Look for:</p>
+    <ul>
+      <li>An open database connection in another process that started a read and never closed it</li>
+      <li>A <code>db.tx()</code> call that is never completing</li>
+    </ul>
+    <p>Check <code>db.diagnostics().db.walSizeBytes</code>. Values over 64MB trigger a warning in <code>db.health()</code>.</p>
+
+    <h2 id="vs-redis">How does Qeed compare to Redis or LevelDB?</h2>
+    <table>
+      <thead><tr><th></th><th>Qeed</th><th>Redis</th><th>LevelDB</th></tr></thead>
+      <tbody>
+        <tr><td>Storage</td><td>SQLite file</td><td>In-memory + RDB/AOF</td><td>LSM files</td></tr>
+        <tr><td>Network</td><td>None (in-process)</td><td>TCP</td><td>None (in-process)</td></tr>
+        <tr><td>Query</td><td>JSON field queries</td><td>Limited (SCAN, Lua)</td><td>Range scans only</td></tr>
+        <tr><td>Transactions</td><td>Yes (ACID)</td><td>MULTI/EXEC (optimistic)</td><td>Batch (no rollback)</td></tr>
+        <tr><td>Setup</td><td>Zero (npm install)</td><td>Separate server process</td><td>Zero</td></tr>
+        <tr><td>Multi-process writes</td><td>Serialized by SQLite</td><td>Yes (single-threaded)</td><td>Single writer</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="import-large">How do I import a very large export file?</h2>
+    <p>The current <code>db.import()</code> loads the full payload into memory before inserting. For files over ~500MB, split the export into smaller files by namespace or collection:</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Export by collection
+await db.export('./users.json',  { namespace: 'app', collection: 'users' });
+await db.export('./posts.json',  { namespace: 'app', collection: 'posts' });
+await db.export('./events.json', { namespace: 'app', collection: 'events' });
+
+// Import each separately — each is its own atomic transaction
+db.import('./users.json');
+db.import('./posts.json');
+db.import('./events.json');</code></pre></div>
+
+    <p>NDJSON format with <code>skipInvalid: true</code> is more resilient for large imports — a single bad record does not abort the entire operation.</p>
+
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="advanced.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">Advanced Guide</span></a>
+      
+    </nav>
+  </div></main>
+  
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#multi-process">Multi-process?</a>
+    <a class="toc-float-link" href="#encryption">Encryption?</a>
+    <a class="toc-float-link" href="#typescript">TypeScript?</a>
+    <a class="toc-float-link" href="#memory">Memory usage?</a>
+    <a class="toc-float-link" href="#corruption">Corruption?</a>
+    <a class="toc-float-link" href="#wal-size">Large WAL file?</a>
+    <a class="toc-float-link" href="#vs-redis">vs Redis / LevelDB?</a>
+    <a class="toc-float-link" href="#import-large">Large imports?</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

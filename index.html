@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Qeed — production-grade SQLite key-value database for Node.js. Namespaces, TTL, query builder, cache, events, backup. By Quantum Developers." />
+  <title>Qeed — SQLite Key-Value Database for Node.js</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <div class="progress-bar"></div>
+
+  <header class="header">
+    <button class="header-menu-btn" aria-label="Open menu">☰</button>
+    <a class="header-logo" href="index.html">
+      <img class="header-logo-img" src="logo.png" alt="Qeed" />
+      <div>
+        <div class="header-logo-name">Qeed</div>
+        <div class="header-logo-version">v1.0.0</div>
+      </div>
+    </a>
+    <div class="header-search-wrap">
+      <span class="header-search-icon">⌕</span>
+      <input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" spellcheck="false" />
+      <div class="search-results"></div>
+    </div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a class="sidebar-link active" href="index.html">Home</a>
+        <a class="sidebar-link" href="pages/installation.html">Installation</a>
+        <a class="sidebar-link" href="pages/quickstart.html">Quick Start</a>
+        <a class="sidebar-link" href="pages/configuration.html">Configuration</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">API</div>
+        <a class="sidebar-link" href="pages/query.html">Query Builder</a>
+        <a class="sidebar-link" href="pages/transactions.html">Transactions</a>
+        <a class="sidebar-link" href="pages/cache.html">Cache System</a>
+        <a class="sidebar-link" href="pages/api.html">API Reference <span class="sidebar-badge">full</span></a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Advanced</div>
+        <a class="sidebar-link" href="pages/advanced.html">Advanced Guide</a>
+        <a class="sidebar-link" href="pages/faq.html">FAQ</a>
+      </div>
+    </nav>
+    <div class="sidebar-overlay"></div>
+
+    <main class="main">
+      <div class="content">
+
+        <!-- Hero -->
+        <section class="hero">
+          <div class="hero-grid"></div>
+          <div class="hero-glow"></div>
+          <div class="hero-eyebrow">Quantum Developers · v1.0.0 · MIT</div>
+          <h1 class="hero-title">
+            The SQLite<br>
+            <span class="grad">key-value database</span><br>
+            your app deserves.
+          </h1>
+          <p class="hero-sub">
+            Namespaces, collections, TTL, a fluent query builder, LRU cache, events,
+            metrics, diagnostics, and atomic backup — all in a single
+            <code>npm install</code>. No server. No schema. No cloud.
+          </p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="pages/quickstart.html">Get started →</a>
+            <a class="btn-secondary" href="pages/api.html">API reference</a>
+            <a class="btn-secondary" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+
+          <div class="install-strip">
+            <span class="prompt">$</span>
+            <span class="cmd">npm install qeed</span>
+            <button class="install-copy" title="Copy">⎘</button>
+          </div>
+
+          <div class="stats-row" style="margin-top:var(--sp-10)">
+            <div class="stat-item"><span class="stat-value">138k+</span><span class="stat-label">writes / second</span></div>
+            <div class="stat-item"><span class="stat-value">1.8M+</span><span class="stat-label">cached reads / second</span></div>
+            <div class="stat-item"><span class="stat-value">342</span><span class="stat-label">passing tests</span></div>
+            <div class="stat-item"><span class="stat-value">1</span><span class="stat-label">dependency</span></div>
+          </div>
+        </section>
+
+        <!-- Quick example -->
+        <h2 id="example">Five lines to your first database</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre><code data-lang="js">import { qeed } from 'qeed';
+
+const db = qeed({ path: './data.db' });
+
+db.set('user:1', { name: 'Alice', role: 'admin', score: 95 });
+db.set('session:abc', { userId: 1 }, { ttl: 30_000 });
+
+const rec = db.get('user:1');
+console.log(rec.value.name);    // 'Alice'
+console.log(rec.createdAt);     // Unix ms
+
+const admins = db.query()
+  .where('role', 'eq', 'admin')
+  .sort('score', 'desc')
+  .limit(10)
+  .get();
+
+db.close();</code></pre>
+        </div>
+
+        <!-- Features -->
+        <h2 id="features">Everything included</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🗄️</div>
+            <div class="feature-name">Namespaces &amp; Collections</div>
+            <div class="feature-desc">Isolate tenants, apps, or domains. Scoped API instances share one connection.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⏱️</div>
+            <div class="feature-name">TTL &amp; Expiration</div>
+            <div class="feature-desc">Per-key expiration in milliseconds. No timers — a single indexed sweep.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-name">Fluent Query Builder</div>
+            <div class="feature-desc">Eight whitelisted operators, dot-notation fields, sort, paginate, project.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-name">LRU Cache</div>
+            <div class="feature-desc">1.8M+ cached reads/s. Write-through invalidation. Namespace-isolated buckets.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <div class="feature-name">Hardened Security</div>
+            <div class="feature-desc">Parameterized queries only. Operator whitelist. Prototype pollution guard.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📦</div>
+            <div class="feature-name">Atomic Batch &amp; Tx</div>
+            <div class="feature-desc">Multi-op transactions with automatic rollback on any thrown error.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📡</div>
+            <div class="feature-name">Events</div>
+            <div class="feature-desc">Synchronous set, update, delete, clear, error. Capped listeners, no leaks.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <div class="feature-name">Metrics &amp; Diagnostics</div>
+            <div class="feature-desc">Latency histograms, slow query log, health checks, PRAGMA introspection.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💾</div>
+            <div class="feature-name">Backup &amp; Restore</div>
+            <div class="feature-desc">Online SQLite backup, gzip, SHA-256 checksums, atomic restore with rollback.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <div class="feature-name">Export &amp; Import</div>
+            <div class="feature-desc">JSON and NDJSON with manifest, checksum verification, and skipInvalid mode.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <div class="feature-name">WAL Mode</div>
+            <div class="feature-desc">Concurrent reads, durable writes, no reader-writer locks by default.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <div class="feature-name">ESM + CJS</div>
+            <div class="feature-desc">Dual export shim. No build step. No bundler. Works everywhere Node 18+ runs.</div>
+          </div>
+        </div>
+
+        <!-- Benchmarks -->
+        <h2 id="benchmarks">Benchmarks</h2>
+        <p>Measured on Node.js v22, Intel Xeon 2.8 GHz, in-memory database. Run <code>node bench/run.js</code> to reproduce.</p>
+
+        <table>
+          <thead>
+            <tr><th>Operation</th><th>Throughput</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr class="bench-row highlight"><td><code>get()</code> — cache hit (LRU)</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">1,800,000 / s</td><td>Zero SQLite I/O</td></tr>
+            <tr class="bench-row"><td><code>has()</code></td><td style="font-family:var(--font-mono);color:var(--col-cyan)">344,000 / s</td><td>Prepared stmt cache</td></tr>
+            <tr class="bench-row"><td><code>get()</code> — no cache</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">310,000 / s</td><td></td></tr>
+            <tr class="bench-row"><td><code>set()</code> — simple value</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">138,000 / s</td><td>WAL, NORMAL sync</td></tr>
+            <tr class="bench-row"><td><code>set()</code> — object value</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">107,000 / s</td><td>Includes serialization</td></tr>
+            <tr class="bench-row"><td><code>batch()</code> 100 ops</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">196,000 ops / s</td><td>1 transaction</td></tr>
+            <tr class="bench-row"><td><code>tx()</code> 10 sets each</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">147,000 ops / s</td><td>BEGIN IMMEDIATE</td></tr>
+            <tr class="bench-row"><td><code>query().count()</code></td><td style="font-family:var(--font-mono);color:var(--col-cyan)">11,700 / s</td><td>10k records</td></tr>
+            <tr class="bench-row"><td>TTL sweep 10k records</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">&lt; 1 ms</td><td>Partial index scan</td></tr>
+          </tbody>
+        </table>
+
+        <!-- What Qeed is not -->
+        <h2 id="tradeoffs">When to use Qeed</h2>
+        <div class="feature-grid" style="grid-template-columns:1fr 1fr;gap:var(--sp-4)">
+          <div class="feature-card">
+            <div class="feature-name" style="color:var(--col-emerald);margin-bottom:var(--sp-3)">✓ Good fit</div>
+            <ul style="padding-left:var(--sp-4);list-style:none">
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Single-process Node.js services</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Persistent caching layer</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Session and config storage</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Local-first applications</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Edge / embedded deployments</li>
+              <li style="color:var(--col-text-2)">Dev tooling and CLI apps</li>
+            </ul>
+          </div>
+          <div class="feature-card">
+            <div class="feature-name" style="color:var(--col-rose);margin-bottom:var(--sp-3)">✗ Not designed for</div>
+            <ul style="padding-left:var(--sp-4);list-style:none">
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Multi-process write concurrency</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Horizontal scaling across machines</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Encryption at rest (use SQLCipher)</li>
+              <li style="margin-bottom:var(--sp-2);color:var(--col-text-2)">Storing cryptographic secrets</li>
+              <li style="color:var(--col-text-2)">Replacing a production RDBMS</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Explore docs -->
+        <h2 id="explore">Explore the docs</h2>
+        <a class="doc-card" href="pages/installation.html">
+          <span class="doc-card-arrow">→</span>
+          <div class="doc-card-title">Installation</div>
+          <div class="doc-card-desc">System requirements, native addon build, and ESM vs CJS usage.</div>
+        </a>
+        <a class="doc-card" href="pages/quickstart.html">
+          <span class="doc-card-arrow">→</span>
+          <div class="doc-card-title">Quick Start</div>
+          <div class="doc-card-desc">Your first database, namespaces, TTL, batch, and transactions in minutes.</div>
+        </a>
+        <a class="doc-card" href="pages/query.html">
+          <span class="doc-card-arrow">→</span>
+          <div class="doc-card-title">Query Builder</div>
+          <div class="doc-card-desc">Fluent API — where, sort, limit, select, pluck, count, exists and more.</div>
+        </a>
+        <a class="doc-card" href="pages/advanced.html">
+          <span class="doc-card-arrow">→</span>
+          <div class="doc-card-title">Advanced Guide</div>
+          <div class="doc-card-desc">Backup, restore, export, import, events, metrics, and security deep-dive.</div>
+        </a>
+
+        <hr />
+        <p style="text-align:center;font-size:0.82rem;color:var(--col-text-3)">
+          Built by <a href="https://github.com/mr-na3san" target="_blank" rel="noopener">Quantum Developers</a> ·
+          <a href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener">GitHub</a> ·
+          <a href="https://npmjs.com/package/qeed" target="_blank" rel="noopener">npm</a> ·
+          MIT License
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/shell.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

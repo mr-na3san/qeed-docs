@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Query Builder — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+</head>
+<body>
+
+  <div class="progress-bar"></div>
+  <header class="header">
+    <button class="header-menu-btn">☰</button>
+    <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+    <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+<div class="shell">
+  
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link active" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>Query Builder</h1>
+    <p>Qeed's fluent query builder lets you filter, sort, and project records using a chainable API. Every query compiles to a fully parameterized SQL statement — no raw SQL, no string interpolation, no injection surface.</p>
+
+    <h2 id="overview">How it works</h2>
+    <p>Calling <code>db.query()</code> returns a <code>QueryBuilder</code> instance. You chain filter and shape methods, then call a terminal method (<code>get</code>, <code>first</code>, <code>count</code>, or <code>exists</code>) to execute.</p>
+    <div class="notice info"><span class="notice-icon">🔒</span><div class="notice-body"><strong>Security guarantee.</strong> The builder accumulates intent as a plain state object. The compiler transforms that state into <code>{ sql, params }</code> — the only place SQL is assembled. It never executes. All user values are in the <code>params</code> array, never in the SQL string. <code>json_extract(value, ?)</code> is used for field paths — the path is a bound parameter.</div></div>
+
+    <h2 id="where">where() and orWhere()</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// AND conditions (chained where calls)
+const admins = db.query()
+  .where('role', 'eq', 'admin')
+  .where('active', 'eq', true)
+  .where('score', 'gte', 80)
+  .get();
+
+// OR condition — must follow at least one where()
+const results = db.query()
+  .where('age', 'lt', 18)
+  .orWhere('role', 'eq', 'guest')
+  .get();
+
+// IN operator — pass an array
+const selected = db.query()
+  .where('role', 'in', ['admin', 'moderator', 'editor'])
+  .get();
+
+// LIKE operator — % and _ are SQLite wildcards
+const found = db.query()
+  .where('name', 'like', 'Al%')
+  .get();</code></pre></div>
+
+    <h2 id="operators">Operator reference</h2>
+    <table>
+      <thead><tr><th>Key</th><th>SQL</th><th>Value type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>eq</code></td><td><code>=</code></td><td>scalar</td><td>Booleans coerced to 1/0</td></tr>
+        <tr><td><code>ne</code></td><td><code>!=</code></td><td>scalar</td><td></td></tr>
+        <tr><td><code>gt</code></td><td><code>&gt;</code></td><td>number | string</td><td></td></tr>
+        <tr><td><code>gte</code></td><td><code>&gt;=</code></td><td>number | string</td><td></td></tr>
+        <tr><td><code>lt</code></td><td><code>&lt;</code></td><td>number | string</td><td></td></tr>
+        <tr><td><code>lte</code></td><td><code>&lt;=</code></td><td>number | string</td><td></td></tr>
+        <tr><td><code>like</code></td><td><code>LIKE</code></td><td>string</td><td><code>%</code> = any chars, <code>_</code> = one char</td></tr>
+        <tr><td><code>in</code></td><td><code>IN (...)</code></td><td>array (max 1000)</td><td>Non-empty array of scalars</td></tr>
+      </tbody>
+    </table>
+    <div class="notice warn"><span class="notice-icon">⚠️</span><div class="notice-body">Any operator string not in this list throws <code>ValidationError</code> immediately — before any SQL is constructed.</div></div>
+
+    <h2 id="prefix">prefix() and keyMatches()</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// prefix() — compiled as BETWEEN range, uses composite index
+const userRecords = db.query().prefix('user:').get();
+const count = db.query().prefix('session:').count();
+
+// keyMatches() — LIKE pattern on the key column
+const matched = db.query().keyMatches('user:_').get();  // user:1, user:2 …
+const wildcard = db.query().keyMatches('%:active').get();</code></pre></div>
+    <div class="notice tip"><span class="notice-icon">⚡</span><div class="notice-body"><strong>Performance.</strong> <code>prefix()</code> compiles to <code>key &gt;= ? AND key &lt; ?</code> — a BETWEEN-style range that hits the <code>(namespace, collection, key)</code> composite index directly. Prefer it over <code>keyMatches()</code> for prefix scans.</div></div>
+
+    <h2 id="sort">sort()</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Sort by a value field (uses json_extract)
+db.query().sort('score', 'desc').get();
+db.query().sort('name', 'asc').get();
+
+// Sort by built-in columns (no json_extract overhead)
+db.query().sort('key', 'asc').get();
+db.query().sort('createdAt', 'desc').get();
+db.query().sort('updatedAt', 'asc').get();</code></pre></div>
+
+    <h2 id="pagination">limit() and offset()</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// First 20 records by score
+const top20 = db.query().sort('score', 'desc').limit(20).get();
+
+// Page 3 (0-indexed pages of 10)
+const page3 = db.query()
+  .sort('createdAt', 'asc')
+  .limit(10)
+  .offset(20)
+  .get();</code></pre></div>
+
+    <h2 id="projection">select() and pluck()</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// select() — return a subset of value fields
+// rec.value = { name: 'Alice', role: 'admin' }
+const partial = db.query().select(['name', 'role']).get();
+
+// Dot-notation works in select()
+// rec.value = { address_city: 'NYC' }
+const cities = db.query().select(['address.city']).get();
+
+// pluck() — return a single scalar as rec.value
+// rec.value = 'Alice'
+const names = db.query().pluck('name').get();
+
+// pluck() on a nested field
+// rec.value = 'NYC'
+const citiesPlucked = db.query().pluck('address.city').get();</code></pre></div>
+
+    <h2 id="terminals">Terminal methods</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const q = db.query().where('role', 'eq', 'admin');
+
+// get() — all matching records
+const records = q.get();         // QeedRecord[]
+
+// first() — first match or null; internally adds LIMIT 1
+const top = q.sort('score', 'desc').first();  // QeedRecord | null
+
+// count() — number of matches
+const n = q.count();             // number
+
+// exists() — true if any match exists; uses SELECT 1 LIMIT 1
+const any = q.exists();          // boolean</code></pre></div>
+    <div class="notice tip"><span class="notice-icon">💡</span><div class="notice-body"><code>first()</code> does <em>not</em> mutate the builder. You can reuse the same builder for <code>first()</code> and <code>get()</code> without interference.</div></div>
+
+    <h2 id="nested">Nested dot-notation</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">db.set('u:1', { profile: { city: 'NYC', age: 28 }, active: true });
+db.set('u:2', { profile: { city: 'LA',  age: 35 }, active: false });
+
+// Filter on a nested field
+const nycUsers = db.query()
+  .where('profile.city', 'eq', 'NYC')
+  .where('profile.age', 'gte', 21)
+  .get();
+
+// Sort by nested field
+const byAge = db.query()
+  .sort('profile.age', 'asc')
+  .get();
+
+// Pluck nested
+const ages = db.query().pluck('profile.age').get();</code></pre></div>
+
+    <h2 id="security">Security design</h2>
+    <p>Every field name passed to <code>where()</code>, <code>sort()</code>, <code>select()</code>, or <code>pluck()</code> is validated against the regex <code>/^[a-zA-Z_][a-zA-Z0-9_.]{0,127}$/</code> and checked against a banned-segment set (<code>__proto__</code>, <code>constructor</code>, <code>prototype</code>). Invalid fields throw <code>ValidationError</code> before any SQL is touched.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// These all throw ValidationError immediately:
+db.query().where("role') OR 1=1 --", 'eq', 'admin');
+db.query().where('__proto__', 'eq', 'anything');
+db.query().where('a.constructor.b', 'eq', 'x');
+db.query().where('role', 'DROP TABLE records', 'x');
+db.query().sort('score', 'sideways');
+
+// SQL injection in values is inert — values are bound parameters
+const rows = db.query().where('role', 'eq', "' OR '1'='1").get();
+// rows === [] — the injection string is treated as a literal value</code></pre></div>
+
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="configuration.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">Configuration</span></a>
+      <a class="page-nav-item next" href="transactions.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">Transactions</span></a>
+    </nav>
+  </div></main>
+  
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#overview">Overview</a>
+    <a class="toc-float-link" href="#where">where() / orWhere()</a>
+    <a class="toc-float-link" href="#operators">Operator reference</a>
+    <a class="toc-float-link" href="#prefix">prefix() / keyMatches()</a>
+    <a class="toc-float-link" href="#sort">sort()</a>
+    <a class="toc-float-link" href="#pagination">limit() / offset()</a>
+    <a class="toc-float-link" href="#projection">select() / pluck()</a>
+    <a class="toc-float-link" href="#terminals">get / first / count / exists</a>
+    <a class="toc-float-link" href="#nested">Nested dot-notation</a>
+    <a class="toc-float-link" href="#security">Security design</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>

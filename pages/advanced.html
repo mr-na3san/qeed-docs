@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Advanced Guide — Qeed Docs</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components.css"/>
+</head>
+<body>
+
+  <div class="progress-bar"></div>
+  <header class="header">
+    <button class="header-menu-btn">☰</button>
+    <a class="header-logo" href="../index.html"><img class="header-logo-img" src="../logo.png" alt="Qeed" /><div><div class="header-logo-name">Qeed</div><div class="header-logo-version">v1.0.0</div></div></a>
+    <div class="header-search-wrap"><span class="header-search-icon">⌕</span><input class="header-search" type="search" placeholder="Search docs… (⌘K)" autocomplete="off" /><div class="search-results"></div></div>
+    <nav class="header-actions">
+      <a class="header-github" href="https://github.com/mr-na3san/qeed" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="header-npm" href="https://npmjs.com/package/qeed" target="_blank" rel="noopener"><svg width="28" height="10" viewBox="0 0 780 250" fill="#cb3837" xmlns="http://www.w3.org/2000/svg"><path d="M240 250V0H0v250h240zm-150-40V90h60v120h-60zM300 0v250h240V90h-60v120h-60V90h-60v160H300zm420 0H480v250h240V0zm-60 210h-60V90h-60v120h-60V40h180v170z"/></svg>NPM</a>
+    </nav>
+  </header>
+<div class="shell">
+  
+  <nav class="sidebar">
+    <div class="sidebar-section"><div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-link" href="../index.html">Home</a>
+      <a class="sidebar-link" href="installation.html">Installation</a>
+      <a class="sidebar-link" href="quickstart.html">Quick Start</a>
+      <a class="sidebar-link" href="configuration.html">Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">API</div>
+      <a class="sidebar-link" href="query.html">Query Builder</a>
+      <a class="sidebar-link" href="transactions.html">Transactions</a>
+      <a class="sidebar-link" href="cache.html">Cache System</a>
+      <a class="sidebar-link" href="api.html">API Reference <span class="sidebar-badge">full</span></a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Advanced</div>
+      <a class="sidebar-link active" href="advanced.html">Advanced Guide</a>
+      <a class="sidebar-link" href="faq.html">FAQ</a>
+    </div>
+  </nav>
+  <div class="sidebar-overlay"></div>
+  <main class="main"><div class="content">
+
+    <h1>Advanced Guide</h1>
+
+    <h2 id="backup">Backup and restore</h2>
+    <p>Qeed uses SQLite's native online backup API — safe to call while the database is actively being read and written.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Create a compressed backup
+const result = await db.backup('./backups', { compress: true });
+console.log(result.filePath);    // backups/qeed-backup-2024-01-01T...db.gz
+console.log(result.checksum);    // SHA-256 of the backup file
+console.log(result.recordCount); // records at backup time
+console.log(result.durationMs);  // how long it took
+
+// Verify without restoring
+const check = await db.verifyBackup('./backups');
+console.log(check.valid);        // true | false
+console.log(check.warnings);     // [] | ['checksum mismatch — ...']
+
+// Atomic restore with automatic rollback on failure
+await db.restore('./backups');
+// If restore fails: pre-restore snapshot is reinstated, error thrown
+
+// List backups
+const manifests = db.listBackups('./backups');</code></pre></div>
+
+    <h4>Restore safety sequence</h4>
+    <ol>
+      <li>Checksum verified against manifest</li>
+      <li>Pre-restore snapshot copied (<code>db.db.pre-restore-snapshot</code>)</li>
+      <li>Database connection closed</li>
+      <li>Backup file copied over live database</li>
+      <li>Connection reopened</li>
+      <li><code>PRAGMA integrity_check</code> run on restored database</li>
+      <li>If check fails: snapshot reinstated, connection reopened, <code>IOError</code> thrown</li>
+      <li>Snapshot deleted</li>
+    </ol>
+
+    <h2 id="export">Export and import</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// Export all records
+await db.export('./data.json');
+
+// Export a namespace
+await db.export('./users.json', { namespace: 'myapp', collection: 'users' });
+
+// Compressed NDJSON
+await db.export('./data.ndjson.gz', { format: 'ndjson', compress: true });
+
+// Import — transactional, all or nothing
+const result = db.import('./data.json');
+console.log(result.imported);  // records written
+console.log(result.skipped);   // records skipped (only with skipInvalid)
+
+// Import with overrides
+db.import('./users.json', {
+  namespace: 'archive',
+  collection: 'users_2023',
+  skipInvalid: true,       // skip bad records instead of failing
+  verifyChecksum: false,   // skip SHA-256 check
+});</code></pre></div>
+
+    <div class="notice tip"><span class="notice-icon">💡</span><div class="notice-body">Every export file starts with a JSON manifest on line 1: <code>magic</code>, <code>version</code>, <code>format</code>, <code>exportedAt</code>, <code>recordCount</code>, and a SHA-256 <code>checksum</code> of the payload. Import validates all of these before touching the database.</div></div>
+
+    <h2 id="events">Events</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">// on() returns an unsubscribe function
+const unsubSet = db.on('set', e => {
+  console.log('created', e.namespace, e.collection, e.key);
+});
+
+const unsubUpdate = db.on('update', e => {
+  console.log('updated', e.key);
+});
+
+db.on('delete', e => { /* ... */ });
+db.on('clear',  e => { /* e.collection is null for flushNamespace */ });
+db.on('error',  e => { /* e.event, e.error — listener threw */ });
+
+db.once('set', fn);   // fires once then auto-removes
+unsubSet();           // unsubscribe
+db.off('update', fn); // remove by function reference
+
+// Listener count
+db.on._state;  // use EventManager directly for introspection</code></pre></div>
+
+    <div class="notice info"><span class="notice-icon">📡</span><div class="notice-body"><strong>Events are synchronous.</strong> They fire after the operation is confirmed and before control returns to the caller. A listener that throws does not crash the emit — the error is caught and re-emitted on <code>'error'</code>.</div></div>
+
+    <h2 id="metrics">Metrics and diagnostics</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">js</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">const m = db.metrics();
+
+// Per-operation stats
+m.ops.set.total;       // total calls
+m.ops.get.avgMs;       // average latency
+m.ops.query.errors;    // error count
+
+// Latency histogram (total ops across all buckets = total operations)
+m.latency.le_1ms;      // ops completing in ≤1ms
+m.latency.le_5ms;      // ops completing in ≤5ms
+m.latency.gt_1000ms;   // ops taking >1s
+
+// Slow queries
+m.slowQueries.count;
+m.slowQueries.thresholdMs;
+m.slowQueries.recent;  // last 10 entries: { op, ms, at, meta }
+
+// Full diagnostics
+const d = db.diagnostics();
+d.health.status;       // 'healthy' | 'degraded' | 'unhealthy'
+d.health.warnings;     // ['high freelist ratio: 35% — consider VACUUM']
+d.db.pageCount;
+d.db.freelistCount;    // >30% of pageCount = consider VACUUM
+d.db.walSizeBytes;     // large WAL = checkpoint may be stalled
+
+// Reset counters
+// const m = new MetricsManager(); m.resetCounters();</code></pre></div>
+
+    <h2 id="security">Security architecture</h2>
+    <p>Every attack vector in the threat model has a specific code-level defense:</p>
+    <table>
+      <thead><tr><th>Threat</th><th>Defense</th><th>Module</th></tr></thead>
+      <tbody>
+        <tr><td>SQL injection via values</td><td>All values are <code>?</code> bound params, never interpolated</td><td><code>store/set.js</code></td></tr>
+        <tr><td>SQL injection via field names</td><td>Regex allowlist + banned segment set; path used as <code>?</code> param in WHERE</td><td><code>query/ops.js</code></td></tr>
+        <tr><td>Operator injection</td><td>Closed Map of 8 tokens; anything else throws before SQL is touched</td><td><code>query/ops.js</code></td></tr>
+        <tr><td>Identifier injection (namespace/collection)</td><td><code>/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/</code> enforced on every call</td><td><code>security/sanitize.js</code></td></tr>
+        <tr><td>Prototype pollution</td><td>Recursive scan + JSON round-trip clone of all incoming objects</td><td><code>security/proto.js</code></td></tr>
+        <tr><td>Unsafe serialization</td><td>Max 10 depth, max 1MB, no functions, no circular refs</td><td><code>security/serialize.js</code></td></tr>
+        <tr><td>Cache corruption</td><td>Invalidate-before-return on every write path; no partial reads cached</td><td><code>src/index.js</code></td></tr>
+        <tr><td>Backup corruption</td><td>SHA-256 checksum + <code>PRAGMA integrity_check</code> before restore commits</td><td><code>io/backup.js</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="wal">WAL mode internals</h2>
+    <p>Write-Ahead Logging is enabled by default (<code>PRAGMA journal_mode=WAL</code>). In WAL mode:</p>
+    <ul>
+      <li>Readers and writers never block each other</li>
+      <li>Writes are appended to the <code>-wal</code> file; readers see a consistent snapshot</li>
+      <li>WAL is checkpointed into the main database file automatically by SQLite</li>
+      <li>A large <code>-wal</code> file (visible in <code>db.diagnostics().db.walSizeBytes</code>) means checkpointing is stalled — usually because a long-running read is holding an old snapshot</li>
+    </ul>
+
+    <h2 id="benchmarks">Benchmarks</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+    <pre><code data-lang="js">node bench/run.js</code></pre></div>
+    <table>
+      <thead><tr><th>Operation</th><th>Throughput</th></tr></thead>
+      <tbody>
+        <tr><td><code>get()</code> cache hit (LRU)</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">1,800,000 / s</td></tr>
+        <tr><td><code>get()</code> no cache</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">310,000 / s</td></tr>
+        <tr><td><code>set()</code> simple value</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">138,000 / s</td></tr>
+        <tr><td><code>batch()</code> 100 ops</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">196,000 ops / s</td></tr>
+        <tr><td>TTL sweep 10k records</td><td style="font-family:var(--font-mono);color:var(--col-cyan)">&lt; 1ms</td></tr>
+      </tbody>
+    </table>
+
+
+    <nav class="page-nav">
+      <a class="page-nav-item" href="api.html"><span class="page-nav-dir">← Previous</span><span class="page-nav-title">API Reference</span></a>
+      <a class="page-nav-item next" href="faq.html"><span class="page-nav-dir">Next →</span><span class="page-nav-title">FAQ</span></a>
+    </nav>
+  </div></main>
+  
+  <aside class="toc-float">
+    <div class="toc-float-label">On this page</div>
+    <a class="toc-float-link" href="#backup">Backup & restore</a>
+    <a class="toc-float-link" href="#export">Export & import</a>
+    <a class="toc-float-link" href="#events">Events</a>
+    <a class="toc-float-link" href="#metrics">Metrics & diagnostics</a>
+    <a class="toc-float-link" href="#security">Security architecture</a>
+    <a class="toc-float-link" href="#wal">WAL mode</a>
+    <a class="toc-float-link" href="#benchmarks">Benchmarks</a>
+  </aside>
+</div>
+<script src="../js/shell.js"></script><script src="../js/app.js"></script>
+</body></html>
